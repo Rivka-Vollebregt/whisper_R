@@ -6,6 +6,7 @@ import ffmpeg
 import numpy as np
 import torch
 import torch.nn.functional as F
+import soundfile as sf
 
 from .utils import exact_div
 
@@ -36,17 +37,19 @@ def load_audio(file: str, sr: int = SAMPLE_RATE):
     A NumPy array containing the audio waveform, in float32 dtype.
     """
     try:
-        # This launches a subprocess to decode audio while down-mixing and resampling as necessary.
-        # Requires the ffmpeg CLI and `ffmpeg-python` package to be installed.
-        out, _ = (
-            ffmpeg.input(file, threads=0)
-            .output("-", format="s16le", acodec="pcm_s16le", ac=1, ar=sr)
-            .run(cmd=["ffmpeg", "-nostdin"], capture_stdout=True, capture_stderr=True)
-        )
-    except ffmpeg.Error as e:
-        raise RuntimeError(f"Failed to load audio: {e.stderr.decode()}") from e
+        # This loads the audio file using the soundfile package.
+        # It automatically resamples the audio if necessary.
+        data, current_sr = sf.read(file, dtype='float32')
 
-    return np.frombuffer(out, np.int16).flatten().astype(np.float32) / 32768.0
+        # If the current sample rate doesn't match the desired sample rate, resample the audio.
+        if current_sr != sr:
+            data = librosa.resample(data, current_sr, sr)
+
+    except Exception as e:
+        raise RuntimeError(f"Failed to load audio: {str(e)}") from e
+
+    return data
+
 
 
 def pad_or_trim(array, length: int = N_SAMPLES, *, axis: int = -1):
