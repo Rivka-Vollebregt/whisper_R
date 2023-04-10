@@ -10,7 +10,13 @@ import tqdm
 from .audio import SAMPLE_RATE, N_FRAMES, HOP_LENGTH, pad_or_trim, log_mel_spectrogram
 from .decoding import DecodingOptions, DecodingResult
 from .tokenizer import LANGUAGES, TO_LANGUAGE_CODE, get_tokenizer
-from .utils import *
+from .utils import exact_div,
+    format_timestamp,
+    get_writer,
+    make_safe,
+    optional_float,
+    optional_int,
+    str2bool
 
 if TYPE_CHECKING:
     from .model import Whisper
