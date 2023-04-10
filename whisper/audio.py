@@ -21,33 +21,7 @@ N_FRAMES = exact_div(N_SAMPLES, HOP_LENGTH)  # 3000: number of frames in a mel s
 
 
 def load_audio(file: str, sr: int = SAMPLE_RATE):
-    """
-    Open an audio file and read as mono waveform, resampling as necessary
-
-    Parameters
-    ----------
-    file: str
-        The audio file to open
-
-    sr: int
-        The sample rate to resample the audio if necessary
-
-    Returns
-    -------
-    A NumPy array containing the audio waveform, in float32 dtype.
-    """
-    try:
-        # This loads the audio file using the soundfile package.
-        # It automatically resamples the audio if necessary.
-        data, current_sr = sf.read(file, dtype='float32')
-
-        # If the current sample rate doesn't match the desired sample rate, resample the audio.
-        if current_sr != sr:
-            data = librosa.resample(data, current_sr, sr)
-
-    except Exception as e:
-        raise RuntimeError(f"Failed to load audio: {str(e)}") from e
-
+    audio = AudioSegment.from_wav(file)
     return data
 
 
